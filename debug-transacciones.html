@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head><title>Debug Transacciones</title></head>
+<body>
+<h1>Abre la consola del navegador (F12)</h1>
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+const supabase = createClient(
+  'https://silighpgbllfboozbsha.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpbGlnaHBnYmxsZmJvb3pic2hhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA2MjU3ODEsImV4cCI6MjA3NjIwMTc4MX0.GkvucK60-WyiWR2dsRaWf3l87-7qBRFncP0NabH4jPc'
+)
+
+console.log('Probando query de transacciones...')
+
+const { data, error } = await supabase
+  .from('transacciones')
+  .select(`
+    *,
+    cliente:clientes(id, nombre, telefono),
+    created_by_user:profiles!created_by(email)
+  `)
+  .order('fecha', { ascending: false })
+
+console.log('Resultado:', { data, error })
+console.log('Cantidad de transacciones:', data?.length)
+if (data && data.length > 0) {
+  console.log('Primera transacción:', data[0])
+}
+</script>
+</body>
+</html>
