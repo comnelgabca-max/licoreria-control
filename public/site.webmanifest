@@ -1,6 +1,7 @@
 {
-  "name": "LicoreriaApp",
-  "short_name": "LicoAPP",
+  "name": "Licorería Control - Sistema de Gestión",
+  "short_name": "Licorería",
+  "description": "Sistema de control de licorería para gestión de clientes y deudas",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",
@@ -13,9 +14,16 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    },
+    {
+      "src": "/favicon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png"
     }
   ],
-  "theme_color": "#ffffff",
+  "theme_color": "#0ea5e9",
   "background_color": "#ffffff",
-  "display": "standalone"
+  "display": "standalone",
+  "start_url": "/",
+  "scope": "/"
 }
