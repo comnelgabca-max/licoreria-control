@@ -119,10 +119,26 @@ const MainLayout = ({ children }) => {
                 <h1 className="text-xl font-bold bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-transparent">
                   Control de Licorería
                 </h1>
-                <p className="text-xs text-gray-500 hidden sm:block">Sistema de gestión</p>
+                {/* Precio del Dólar - Versión Móvil Compacta */}
+                <div className="flex md:hidden items-center gap-1 mt-0.5">
+                  <Icon name="dollarSign" size="sm" className="text-green-600" />
+                  <p className="text-xs font-semibold text-green-700">{precioDolar} Bs.</p>
+                  {userRole === 'admin' && (
+                    <button
+                      onClick={handleOpenModalDolar}
+                      className="ml-1 p-0.5 text-green-600 hover:bg-green-100 rounded transition-colors"
+                      title="Editar precio"
+                    >
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+                <p className="text-xs text-gray-500 hidden sm:block md:hidden">Sistema de gestión</p>
               </div>
 
-              {/* Precio del Dólar */}
+              {/* Precio del Dólar - Versión Desktop */}
               <div className="hidden md:flex items-center gap-2 ml-4 px-3 py-2 bg-green-50 border border-green-200 rounded-lg">
                 <Icon name="dollarSign" size="sm" className="text-green-600" />
                 <div>
@@ -237,7 +253,7 @@ const MainLayout = ({ children }) => {
               </div>
 
               {/* Mobile user info */}
-              <div className="p-4 bg-gray-50 border-b border-gray-200">
+              <div className="p-4 bg-gray-50 border-b border-gray-200 space-y-3">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-gradient-to-br from-sky-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
                     {currentUser?.email?.charAt(0).toUpperCase()}
@@ -247,6 +263,33 @@ const MainLayout = ({ children }) => {
                     <Badge variant="primary" size="sm" className="mt-1">
                       {userRole}
                     </Badge>
+                  </div>
+                </div>
+
+                {/* Precio del Dólar en Sidebar Móvil */}
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Icon name="dollarSign" size="md" className="text-green-600" />
+                      <div>
+                        <p className="text-xs text-gray-600">Precio del dólar</p>
+                        <p className="text-lg font-bold text-green-700">{precioDolar} Bs.</p>
+                      </div>
+                    </div>
+                    {userRole === 'admin' && (
+                      <button
+                        onClick={() => {
+                          setSidebarOpen(false);
+                          handleOpenModalDolar();
+                        }}
+                        className="p-2 text-green-600 hover:bg-green-100 rounded-lg transition-colors"
+                        title="Editar precio"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
