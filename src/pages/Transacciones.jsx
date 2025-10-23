@@ -8,6 +8,7 @@ import Icon from '../components/ui/Icon';
 import EmptyState from '../components/ui/EmptyState';
 import Modal from '../components/ui/Modal';
 import SkeletonLoader from '../components/ui/SkeletonLoader';
+import MoneyDisplay from '../components/ui/MoneyDisplay';
 import { getAllTransacciones, createVenta, createPago, deleteTransaccion } from '../services/transaccionesService';
 import { getAllClientes } from '../services/clientesService';
 import { useAuth } from '../context/AuthContext';
@@ -267,7 +268,7 @@ const Transacciones = () => {
             <Card.Body className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 mb-1">Total Ventas</p>
-                <p className="text-3xl font-bold text-amber-600">${totalVentas.toFixed(2)}</p>
+                <MoneyDisplay amount={totalVentas} size="3xl" color="amber" />
                 <p className="text-xs text-gray-500 mt-1">
                   {transaccionesFiltradas.filter(t => t.tipo === 'venta').length} transacciones
                 </p>
@@ -282,7 +283,7 @@ const Transacciones = () => {
             <Card.Body className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 mb-1">Total Pagos</p>
-                <p className="text-3xl font-bold text-green-600">${totalPagos.toFixed(2)}</p>
+                <MoneyDisplay amount={totalPagos} size="3xl" color="green" />
                 <p className="text-xs text-gray-500 mt-1">
                   {transaccionesFiltradas.filter(t => t.tipo === 'pago').length} transacciones
                 </p>
@@ -299,11 +300,11 @@ const Transacciones = () => {
             <Card.Body className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 mb-1">Balance</p>
-                <p className={`text-3xl font-bold ${
-                  balance > 0 ? 'text-red-600' : 'text-sky-600'
-                }`}>
-                  ${Math.abs(balance).toFixed(2)}
-                </p>
+                <MoneyDisplay
+                  amount={Math.abs(balance)}
+                  size="3xl"
+                  color={balance > 0 ? 'red' : 'sky'}
+                />
                 <p className="text-xs text-gray-500 mt-1">
                   {balance > 0 ? 'Deuda neta' : 'A favor'}
                 </p>
@@ -458,11 +459,11 @@ const Transacciones = () => {
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <p className={`font-bold text-lg ${
-                            transaccion.tipo === 'venta' ? 'text-amber-600' : 'text-green-600'
-                          }`}>
-                            ${parseFloat(transaccion.monto).toFixed(2)}
-                          </p>
+                          <MoneyDisplay
+                            amount={transaccion.monto}
+                            size="lg"
+                            color={transaccion.tipo === 'venta' ? 'amber' : 'green'}
+                          />
                         </td>
                         {isAdmin && (
                           <td className="px-6 py-4 text-right">
@@ -520,11 +521,12 @@ const Transacciones = () => {
                         </div>
                       </div>
                       <div className="text-right flex-shrink-0">
-                        <p className={`font-bold text-lg ${
-                          transaccion.tipo === 'venta' ? 'text-amber-600' : 'text-green-600'
-                        }`}>
-                          ${parseFloat(transaccion.monto).toFixed(2)}
-                        </p>
+                        <MoneyDisplay
+                          amount={transaccion.monto}
+                          size="lg"
+                          color={transaccion.tipo === 'venta' ? 'amber' : 'green'}
+                          className="items-end"
+                        />
                         {isAdmin && (
                           <Button
                             variant="ghost"

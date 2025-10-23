@@ -8,6 +8,7 @@ import Icon from '../components/ui/Icon';
 import EmptyState from '../components/ui/EmptyState';
 import Modal from '../components/ui/Modal';
 import SkeletonLoader from '../components/ui/SkeletonLoader';
+import MoneyDisplay from '../components/ui/MoneyDisplay';
 import {
   getCuentasAbiertas,
   createCuenta,
@@ -292,7 +293,7 @@ const CuentasRapidas = () => {
             <Card.Body className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 mb-1">Total Abierto</p>
-                <p className="text-3xl font-bold text-amber-600">${stats.total_abierto.toFixed(2)}</p>
+                <MoneyDisplay amount={stats.total_abierto} size="3xl" color="amber" />
               </div>
               <div className="w-14 h-14 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center text-white">
                 <Icon name="dollarSign" size="lg" />
@@ -316,7 +317,7 @@ const CuentasRapidas = () => {
             <Card.Body className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 mb-1">Total Pagado Hoy</p>
-                <p className="text-3xl font-bold text-blue-600">${stats.total_pagado_hoy.toFixed(2)}</p>
+                <MoneyDisplay amount={stats.total_pagado_hoy} size="3xl" color="blue" />
               </div>
               <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white">
                 <Icon name="dollarSign" size="lg" />
@@ -372,9 +373,11 @@ const CuentasRapidas = () => {
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-600">Total:</span>
-                        <span className="text-2xl font-bold text-sky-600">
-                          ${parseFloat(cuenta.total || 0).toFixed(2)}
-                        </span>
+                        <MoneyDisplay
+                          amount={cuenta.total || 0}
+                          size="2xl"
+                          color="sky"
+                        />
                       </div>
                     </div>
 
@@ -460,9 +463,11 @@ const CuentasRapidas = () => {
             <div className="bg-gradient-to-r from-sky-50 to-blue-50 border border-sky-200 rounded-lg p-4">
               <div className="flex items-center justify-between">
                 <span className="text-lg font-semibold text-gray-700">Total de la Cuenta:</span>
-                <span className="text-3xl font-bold text-sky-600">
-                  ${parseFloat(cuentaActual.total || 0).toFixed(2)}
-                </span>
+                <MoneyDisplay
+                  amount={cuentaActual.total || 0}
+                  size="3xl"
+                  color="sky"
+                />
               </div>
             </div>
 
@@ -534,9 +539,11 @@ const CuentasRapidas = () => {
                         </p>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="text-lg font-bold text-gray-900">
-                          ${parseFloat(item.subtotal).toFixed(2)}
-                        </span>
+                        <MoneyDisplay
+                          amount={item.subtotal}
+                          size="lg"
+                          color="default"
+                        />
                         <Button
                           variant="ghost"
                           size="sm"
@@ -579,8 +586,12 @@ const CuentasRapidas = () => {
         >
           <div className="space-y-4">
             <div className="bg-sky-50 border border-sky-200 rounded-lg p-4">
-              <p className="text-sm text-gray-600 mb-1">Total a cobrar:</p>
-              <p className="text-4xl font-bold text-sky-600">${parseFloat(cuentaActual.total || 0).toFixed(2)}</p>
+              <p className="text-sm text-gray-600 mb-2">Total a cobrar:</p>
+              <MoneyDisplay
+                amount={cuentaActual.total || 0}
+                size="3xl"
+                color="sky"
+              />
             </div>
 
             <div>

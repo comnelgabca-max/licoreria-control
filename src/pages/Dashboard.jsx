@@ -10,6 +10,7 @@ import Icon from '../components/ui/Icon';
 import SkeletonLoader from '../components/ui/SkeletonLoader';
 import Modal from '../components/ui/Modal';
 import Input from '../components/ui/Input';
+import MoneyDisplay from '../components/ui/MoneyDisplay';
 
 // Importar servicios
 import { getDashboardStats, getTopDeudores, getActividadReciente } from '../services/dashboardService';
@@ -278,7 +279,7 @@ const Dashboard = () => {
           <div className="animate-slide-up animation-delay-100">
             <StatCard
               title="Total Deudas"
-              value={`$${parseFloat(stats.total_deudas || 0).toFixed(2)}`}
+              value={<MoneyDisplay amount={stats.total_deudas || 0} size="3xl" color="red" />}
               subtitle="Por cobrar"
               icon={<Icon name="dollarSign" size="xl" />}
               variant="danger"
@@ -288,7 +289,7 @@ const Dashboard = () => {
           <div className="animate-slide-up animation-delay-200">
             <StatCard
               title="Pagos Hoy"
-              value={`$${parseFloat(stats.pagos_hoy || 0).toFixed(2)}`}
+              value={<MoneyDisplay amount={stats.pagos_hoy || 0} size="3xl" color="green" />}
               subtitle="Recibidos"
               icon={<Icon name="check" size="xl" />}
               variant="success"
@@ -298,7 +299,7 @@ const Dashboard = () => {
           <div className="animate-slide-up animation-delay-300">
             <StatCard
               title="Ventas Hoy"
-              value={`$${parseFloat(stats.ventas_hoy || 0).toFixed(2)}`}
+              value={<MoneyDisplay amount={stats.ventas_hoy || 0} size="3xl" color="amber" />}
               subtitle="Nuevas deudas"
               icon={<Icon name="shoppingCart" size="xl" />}
               variant="warning"
@@ -360,11 +361,19 @@ const Dashboard = () => {
                           </div>
                         </div>
                         <div className="text-right flex-shrink-0">
-                          <p className={`font-bold text-lg ${
-                            transaccion.tipo === 'pago' ? 'text-green-600' : 'text-amber-600'
-                          }`}>
-                            {transaccion.tipo === 'pago' ? '-' : '+'} ${parseFloat(transaccion.monto).toFixed(2)}
-                          </p>
+                          <div className="text-right">
+                            <p className={`text-xs font-medium mb-1 ${
+                              transaccion.tipo === 'pago' ? 'text-green-600' : 'text-amber-600'
+                            }`}>
+                              {transaccion.tipo === 'pago' ? '-' : '+'}
+                            </p>
+                            <MoneyDisplay
+                              amount={transaccion.monto}
+                              size="lg"
+                              color={transaccion.tipo === 'pago' ? 'green' : 'amber'}
+                              className="items-end"
+                            />
+                          </div>
                           <Badge
                             variant={transaccion.tipo === 'pago' ? 'success' : 'warning'}
                             size="sm"
@@ -435,7 +444,12 @@ const Dashboard = () => {
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold text-red-600">${parseFloat(cliente.deuda).toFixed(2)}</p>
+                        <MoneyDisplay
+                          amount={cliente.deuda}
+                          size="lg"
+                          color="red"
+                          className="items-end"
+                        />
                       </div>
                     </div>
                   ))}

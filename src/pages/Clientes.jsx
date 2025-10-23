@@ -8,6 +8,7 @@ import Icon from '../components/ui/Icon';
 import EmptyState from '../components/ui/EmptyState';
 import Modal from '../components/ui/Modal';
 import SkeletonLoader from '../components/ui/SkeletonLoader';
+import MoneyDisplay from '../components/ui/MoneyDisplay';
 import { getAllClientes, createCliente, updateCliente, deleteCliente } from '../services/clientesService';
 import { getAllTransacciones } from '../services/transaccionesService';
 import { useAuth } from '../context/AuthContext';
@@ -288,7 +289,7 @@ const Clientes = () => {
             <Card.Body className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 mb-1">Deuda Total</p>
-                <p className="text-3xl font-bold text-amber-600">${totalDeuda.toFixed(2)}</p>
+                <MoneyDisplay amount={totalDeuda} size="3xl" color="amber" />
               </div>
               <div className="w-14 h-14 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center text-white">
                 <Icon name="dollarSign" size="lg" />
@@ -412,12 +413,11 @@ const Clientes = () => {
                           </p>
                         </td>
                         <td className="px-6 py-4">
-                          <Badge
-                            variant={cliente.saldo_total > 0 ? 'danger' : 'success'}
-                            size="md"
-                          >
-                            ${parseFloat(cliente.saldo_total || 0).toFixed(2)}
-                          </Badge>
+                          <MoneyDisplay
+                            amount={cliente.saldo_total || 0}
+                            size="lg"
+                            color={cliente.saldo_total > 0 ? 'red' : 'green'}
+                          />
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center justify-end gap-2">
@@ -469,12 +469,12 @@ const Clientes = () => {
                         <p className="text-sm text-gray-600">{cliente.telefono || 'Sin teléfono'}</p>
                         <p className="text-xs text-gray-500 truncate mt-1">{cliente.direccion || 'Sin dirección'}</p>
                       </div>
-                      <Badge
-                        variant={cliente.saldo_total > 0 ? 'danger' : 'success'}
+                      <MoneyDisplay
+                        amount={cliente.saldo_total || 0}
                         size="md"
-                      >
-                        ${parseFloat(cliente.saldo_total || 0).toFixed(2)}
-                      </Badge>
+                        color={cliente.saldo_total > 0 ? 'red' : 'green'}
+                        className="items-end"
+                      />
                     </div>
 
                     <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
@@ -626,22 +626,28 @@ const Clientes = () => {
           {clienteTransacciones && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
               <div>
-                <p className="text-xs text-gray-600">Total Ventas</p>
-                <p className="text-xl font-bold text-blue-600">
-                  ${transacciones.filter(t => t.tipo === 'venta').reduce((sum, t) => sum + parseFloat(t.monto || 0), 0).toFixed(2)}
-                </p>
+                <p className="text-xs text-gray-600 mb-1">Total Ventas</p>
+                <MoneyDisplay
+                  amount={transacciones.filter(t => t.tipo === 'venta').reduce((sum, t) => sum + parseFloat(t.monto || 0), 0)}
+                  size="xl"
+                  color="blue"
+                />
               </div>
               <div>
-                <p className="text-xs text-gray-600">Total Pagos</p>
-                <p className="text-xl font-bold text-green-600">
-                  ${transacciones.filter(t => t.tipo === 'pago').reduce((sum, t) => sum + parseFloat(t.monto || 0), 0).toFixed(2)}
-                </p>
+                <p className="text-xs text-gray-600 mb-1">Total Pagos</p>
+                <MoneyDisplay
+                  amount={transacciones.filter(t => t.tipo === 'pago').reduce((sum, t) => sum + parseFloat(t.monto || 0), 0)}
+                  size="xl"
+                  color="green"
+                />
               </div>
               <div>
-                <p className="text-xs text-gray-600">Saldo Actual</p>
-                <p className="text-xl font-bold text-red-600">
-                  ${parseFloat(clienteTransacciones.saldo_total || 0).toFixed(2)}
-                </p>
+                <p className="text-xs text-gray-600 mb-1">Saldo Actual</p>
+                <MoneyDisplay
+                  amount={clienteTransacciones.saldo_total || 0}
+                  size="xl"
+                  color="red"
+                />
               </div>
             </div>
           )}
@@ -689,11 +695,19 @@ const Clientes = () => {
                         {trans.descripcion || 'Sin descripción'}
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <span className={`text-sm font-semibold ${
-                          trans.tipo === 'venta' ? 'text-blue-600' : 'text-green-600'
-                        }`}>
-                          {trans.tipo === 'venta' ? '+' : '-'}${parseFloat(trans.monto || 0).toFixed(2)}
-                        </span>
+                        <div className="inline-flex items-center gap-1">
+                          <span className={`text-sm font-semibold ${
+                            trans.tipo === 'venta' ? 'text-blue-600' : 'text-green-600'
+                          }`}>
+                            {trans.tipo === 'venta' ? '+' : '-'}
+                          </span>
+                          <MoneyDisplay
+                            amount={trans.monto || 0}
+                            size="sm"
+                            color={trans.tipo === 'venta' ? 'blue' : 'green'}
+                            className="items-end"
+                          />
+                        </div>
                       </td>
                     </tr>
                   ))}
