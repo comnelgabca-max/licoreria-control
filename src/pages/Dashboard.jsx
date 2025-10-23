@@ -55,6 +55,11 @@ const Dashboard = () => {
   const [transaccionErrors, setTransaccionErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
 
+  // Búsqueda de clientes
+  const [busquedaCliente, setBusquedaCliente] = useState('');
+  const [mostrarDropdown, setMostrarDropdown] = useState(false);
+  const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
+
   // Cargar datos al montar el componente
   useEffect(() => {
     loadDashboardData();
@@ -115,6 +120,19 @@ const Dashboard = () => {
     return `Hace ${diffDays} días`;
   };
 
+  // Normalizar texto para búsqueda (sin espacios, sin mayúsculas)
+  const normalizarTexto = (texto) => {
+    return texto.toLowerCase().replace(/\s+/g, '');
+  };
+
+  // Filtrar clientes por búsqueda
+  const clientesFiltrados = clientes.filter(cliente => {
+    if (!busquedaCliente.trim()) return true;
+    const nombreNormalizado = normalizarTexto(cliente.nombre);
+    const busquedaNormalizada = normalizarTexto(busquedaCliente);
+    return nombreNormalizado.includes(busquedaNormalizada);
+  });
+
   // ============= FUNCIONES PARA CLIENTE =============
   const handleOpenClienteModal = () => {
     setClienteFormData({ nombre: '', telefono: '', direccion: '', notas: '' });
@@ -174,6 +192,9 @@ const Dashboard = () => {
     setTransaccionTipo('venta');
     setTransaccionFormData({ cliente_id: '', monto: '', descripcion: '' });
     setTransaccionErrors({});
+    setBusquedaCliente('');
+    setClienteSeleccionado(null);
+    setMostrarDropdown(false);
     setShowTransaccionModal(true);
   };
 
@@ -181,6 +202,9 @@ const Dashboard = () => {
     setTransaccionTipo('pago');
     setTransaccionFormData({ cliente_id: '', monto: '', descripcion: '' });
     setTransaccionErrors({});
+    setBusquedaCliente('');
+    setClienteSeleccionado(null);
+    setMostrarDropdown(false);
     setShowTransaccionModal(true);
   };
 
@@ -188,6 +212,19 @@ const Dashboard = () => {
     setShowTransaccionModal(false);
     setTransaccionFormData({ cliente_id: '', monto: '', descripcion: '' });
     setTransaccionErrors({});
+    setBusquedaCliente('');
+    setClienteSeleccionado(null);
+    setMostrarDropdown(false);
+  };
+
+  const handleSeleccionarCliente = (cliente) => {
+    setClienteSeleccionado(cliente);
+    setBusquedaCliente(cliente.nombre);
+    setTransaccionFormData(prev => ({ ...prev, cliente_id: cliente.id }));
+    setMostrarDropdown(false);
+    if (transaccionErrors.cliente_id) {
+      setTransaccionErrors(prev => ({ ...prev, cliente_id: '' }));
+    }
   };
 
   const handleTransaccionInputChange = (e) => {
@@ -627,19 +664,68 @@ const Dashboard = () => {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Cliente <span className="text-red-500">*</span>
             </label>
-            <select
-              name="cliente_id"
-              value={transaccionFormData.cliente_id}
-              onChange={handleTransaccionInputChange}
-              className={`w-full px-4 py-2.5 border ${transaccionErrors.cliente_id ? 'border-red-300' : 'border-gray-300'} rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all duration-200`}
-            >
-              <option value="">Seleccionar cliente...</option>
-              {clientes.map(cliente => (
-                <option key={cliente.id} value={cliente.id}>
-                  {cliente.nombre} {cliente.saldo_total > 0 ? `(Deuda: $${parseFloat(cliente.saldo_total).toFixed(2)})` : ''}
-                </option>
-              ))}
-            </select>
+
+            {/* Buscador con autocompletado */}
+            <div className="relative">
+              <Input
+                type="text"
+                placeholder="Buscar y seleccionar cliente..."
+                value={busquedaCliente}
+                onChange={(e) => {
+                  setBusquedaCliente(e.target.value);
+                  setMostrarDropdown(true);
+                  if (!e.target.value.trim()) {
+                    setClienteSeleccionado(null);
+                    setTransaccionFormData(prev => ({ ...prev, cliente_id: '' }));
+                  }
+                }}
+                onFocus={() => setMostrarDropdown(true)}
+                icon={<Icon name="search" size="sm" />}
+                iconPosition="left"
+                error={transaccionErrors.cliente_id}
+              />
+
+              {/* Dropdown de resultados */}
+              {mostrarDropdown && busquedaCliente.trim() && (
+                <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  {clientesFiltrados.length === 0 ? (
+                    <div className="p-3 text-sm text-gray-500 text-center">
+                      No se encontraron clientes
+                    </div>
+                  ) : (
+                    clientesFiltrados.map((cliente) => (
+                      <button
+                        key={cliente.id}
+                        type="button"
+                        onClick={() => handleSeleccionarCliente(cliente)}
+                        className="w-full px-4 py-3 text-left hover:bg-sky-50 transition-colors border-b border-gray-100 last:border-0"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <p className="font-semibold text-gray-900">{cliente.nombre}</p>
+                            {cliente.telefono && (
+                              <p className="text-xs text-gray-500">{cliente.telefono}</p>
+                            )}
+                          </div>
+                          {cliente.saldo_total > 0 && (
+                            <Badge variant="danger" size="sm">
+                              Deuda: ${parseFloat(cliente.saldo_total).toFixed(2)}
+                            </Badge>
+                          )}
+                        </div>
+                      </button>
+                    ))
+                  )}
+                </div>
+              )}
+
+              {clienteSeleccionado && (
+                <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                  <Icon name="check" size="sm" />
+                  Cliente seleccionado
+                </p>
+              )}
+            </div>
             {transaccionErrors.cliente_id && (
               <p className="text-red-500 text-xs mt-1">{transaccionErrors.cliente_id}</p>
             )}
