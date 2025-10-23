@@ -95,7 +95,7 @@ const Login = () => {
               iconPosition="left"
             />
 
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center text-sm">
               <label className="flex items-center gap-2 cursor-pointer group">
                 <input
                   type="checkbox"
@@ -103,12 +103,6 @@ const Login = () => {
                 />
                 <span className="text-gray-600 group-hover:text-gray-900 transition-colors">Recordarme</span>
               </label>
-              <button
-                type="button"
-                className="text-sky-600 hover:text-sky-700 font-medium transition-colors"
-              >
-                ¿Olvidaste tu contraseña?
-              </button>
             </div>
 
             <Button
@@ -122,15 +116,6 @@ const Login = () => {
               {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
             </Button>
           </form>
-
-          {/* Demo credentials */}
-          <div className="mt-6 p-4 bg-gradient-to-r from-sky-50 to-blue-50 rounded-lg border border-sky-200">
-            <p className="text-xs font-semibold text-gray-700 mb-2">Credenciales de prueba:</p>
-            <div className="space-y-1 text-xs text-gray-600">
-              <p><strong>Admin:</strong> admin@licoreria.com / admin123</p>
-              <p><strong>Moderador:</strong> mod@licoreria.com / mod123</p>
-            </div>
-          </div>
         </div>
 
         {/* Footer */}
