@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Clientes from './pages/Clientes';
 import Transacciones from './pages/Transacciones';
+import CuentasRapidas from './pages/CuentasRapidas';
 import Usuarios from './pages/Usuarios';
 import Chat from './pages/Chat';
 
@@ -40,6 +41,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Transacciones />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/cuentas-rapidas"
+            element={
+              <ProtectedRoute>
+                <CuentasRapidas />
               </ProtectedRoute>
             }
           />

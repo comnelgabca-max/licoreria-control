@@ -87,6 +87,7 @@ const MainLayout = ({ children }) => {
     { path: '/', label: 'Dashboard', icon: 'chartBar', roles: ['admin', 'moderador'] },
     { path: '/clientes', label: 'Clientes', icon: 'users', roles: ['admin', 'moderador'] },
     { path: '/transacciones', label: 'Transacciones', icon: 'dollarSign', roles: ['admin', 'moderador'] },
+    { path: '/cuentas-rapidas', label: 'Cuentas Rápidas', icon: 'creditCard', roles: ['admin', 'moderador'] },
     { path: '/chat', label: 'Chat', icon: 'users', roles: ['admin', 'moderador'] },
     { path: '/usuarios', label: 'Usuarios', icon: 'users', roles: ['admin'] },
   ];
