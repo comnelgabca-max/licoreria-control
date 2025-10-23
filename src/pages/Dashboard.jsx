@@ -8,9 +8,13 @@ import Badge from '../components/ui/Badge';
 import EmptyState from '../components/ui/EmptyState';
 import Icon from '../components/ui/Icon';
 import SkeletonLoader from '../components/ui/SkeletonLoader';
+import Modal from '../components/ui/Modal';
+import Input from '../components/ui/Input';
 
 // Importar servicios
 import { getDashboardStats, getTopDeudores, getActividadReciente } from '../services/dashboardService';
+import { createCliente, getAllClientes } from '../services/clientesService';
+import { createVenta, createPago } from '../services/transaccionesService';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -24,10 +28,36 @@ const Dashboard = () => {
   });
   const [topDeudores, setTopDeudores] = useState([]);
   const [actividadReciente, setActividadReciente] = useState([]);
+  const [clientes, setClientes] = useState([]);
+
+  // Estados para modales
+  const [showClienteModal, setShowClienteModal] = useState(false);
+  const [showTransaccionModal, setShowTransaccionModal] = useState(false);
+  const [transaccionTipo, setTransaccionTipo] = useState('venta'); // 'venta' o 'pago'
+
+  // Datos de formularios
+  const [clienteFormData, setClienteFormData] = useState({
+    nombre: '',
+    telefono: '',
+    direccion: '',
+    notas: ''
+  });
+
+  const [transaccionFormData, setTransaccionFormData] = useState({
+    cliente_id: '',
+    monto: '',
+    descripcion: ''
+  });
+
+  // Errores de formularios
+  const [clienteErrors, setClienteErrors] = useState({});
+  const [transaccionErrors, setTransaccionErrors] = useState({});
+  const [submitting, setSubmitting] = useState(false);
 
   // Cargar datos al montar el componente
   useEffect(() => {
     loadDashboardData();
+    loadClientes();
   }, []);
 
   const loadDashboardData = async () => {
@@ -57,6 +87,17 @@ const Dashboard = () => {
     }
   };
 
+  const loadClientes = async () => {
+    try {
+      const response = await getAllClientes();
+      if (response.success) {
+        setClientes(response.data || []);
+      }
+    } catch (error) {
+      console.error('Error cargando clientes:', error);
+    }
+  };
+
   // Formato de fecha relativa
   const formatearFechaRelativa = (fecha) => {
     const ahora = new Date();
@@ -71,6 +112,136 @@ const Dashboard = () => {
     if (diffHours < 24) return `Hace ${diffHours} h`;
     if (diffDays === 1) return 'Ayer';
     return `Hace ${diffDays} días`;
+  };
+
+  // ============= FUNCIONES PARA CLIENTE =============
+  const handleOpenClienteModal = () => {
+    setClienteFormData({ nombre: '', telefono: '', direccion: '', notas: '' });
+    setClienteErrors({});
+    setShowClienteModal(true);
+  };
+
+  const handleCloseClienteModal = () => {
+    setShowClienteModal(false);
+    setClienteFormData({ nombre: '', telefono: '', direccion: '', notas: '' });
+    setClienteErrors({});
+  };
+
+  const handleClienteInputChange = (e) => {
+    const { name, value } = e.target;
+    setClienteFormData(prev => ({ ...prev, [name]: value }));
+    if (clienteErrors[name]) {
+      setClienteErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const validateClienteForm = () => {
+    const errors = {};
+    if (!clienteFormData.nombre.trim()) {
+      errors.nombre = 'El nombre es obligatorio';
+    }
+    if (clienteFormData.telefono && !/^[0-9\-\s()]+$/.test(clienteFormData.telefono)) {
+      errors.telefono = 'Formato de teléfono inválido';
+    }
+    setClienteErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleSaveCliente = async () => {
+    if (!validateClienteForm()) return;
+
+    setSubmitting(true);
+    try {
+      const response = await createCliente(clienteFormData);
+      if (response.success) {
+        handleCloseClienteModal();
+        loadDashboardData();
+        loadClientes();
+      } else {
+        setClienteErrors({ general: response.error || 'Error al crear el cliente' });
+      }
+    } catch (error) {
+      console.error('Error creando cliente:', error);
+      setClienteErrors({ general: 'Error al crear el cliente' });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // ============= FUNCIONES PARA TRANSACCIÓN =============
+  const handleOpenVentaModal = () => {
+    setTransaccionTipo('venta');
+    setTransaccionFormData({ cliente_id: '', monto: '', descripcion: '' });
+    setTransaccionErrors({});
+    setShowTransaccionModal(true);
+  };
+
+  const handleOpenPagoModal = () => {
+    setTransaccionTipo('pago');
+    setTransaccionFormData({ cliente_id: '', monto: '', descripcion: '' });
+    setTransaccionErrors({});
+    setShowTransaccionModal(true);
+  };
+
+  const handleCloseTransaccionModal = () => {
+    setShowTransaccionModal(false);
+    setTransaccionFormData({ cliente_id: '', monto: '', descripcion: '' });
+    setTransaccionErrors({});
+  };
+
+  const handleTransaccionInputChange = (e) => {
+    const { name, value } = e.target;
+    setTransaccionFormData(prev => ({ ...prev, [name]: value }));
+    if (transaccionErrors[name]) {
+      setTransaccionErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const validateTransaccionForm = () => {
+    const errors = {};
+    if (!transaccionFormData.cliente_id) {
+      errors.cliente_id = 'Debes seleccionar un cliente';
+    }
+    if (!transaccionFormData.monto || parseFloat(transaccionFormData.monto) <= 0) {
+      errors.monto = 'El monto debe ser mayor a 0';
+    }
+    if (!transaccionFormData.descripcion.trim()) {
+      errors.descripcion = 'La descripción es obligatoria';
+    }
+    setTransaccionErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleSaveTransaccion = async () => {
+    if (!validateTransaccionForm()) return;
+
+    setSubmitting(true);
+    try {
+      const dataToSend = {
+        clienteId: transaccionFormData.cliente_id,
+        monto: parseFloat(transaccionFormData.monto),
+        descripcion: transaccionFormData.descripcion
+      };
+
+      let response;
+      if (transaccionTipo === 'venta') {
+        response = await createVenta(dataToSend);
+      } else {
+        response = await createPago(dataToSend);
+      }
+
+      if (response.success) {
+        handleCloseTransaccionModal();
+        loadDashboardData();
+      } else {
+        setTransaccionErrors({ general: response.error || 'Error al guardar la transacción' });
+      }
+    } catch (error) {
+      console.error('Error guardando transacción:', error);
+      setTransaccionErrors({ general: 'Error al guardar la transacción' });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (loading) {
@@ -292,7 +463,7 @@ const Dashboard = () => {
             <h3 className="text-lg font-semibold text-gray-900 mb-6">Acciones Rápidas</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <button
-                onClick={() => navigate('/clientes')}
+                onClick={handleOpenClienteModal}
                 className="group bg-white/80 backdrop-blur-sm hover:bg-white border-2 border-sky-200/50 hover:border-sky-300 rounded-xl p-5 text-left transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
               >
                 <div className="w-12 h-12 mb-3 rounded-xl bg-gradient-to-br from-sky-500 to-sky-600 flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300">
@@ -303,7 +474,7 @@ const Dashboard = () => {
               </button>
 
               <button
-                onClick={() => navigate('/transacciones')}
+                onClick={handleOpenPagoModal}
                 className="group bg-white/80 backdrop-blur-sm hover:bg-white border-2 border-green-200/50 hover:border-green-300 rounded-xl p-5 text-left transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
               >
                 <div className="w-12 h-12 mb-3 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300">
@@ -314,7 +485,7 @@ const Dashboard = () => {
               </button>
 
               <button
-                onClick={() => navigate('/transacciones')}
+                onClick={handleOpenVentaModal}
                 className="group bg-white/80 backdrop-blur-sm hover:bg-white border-2 border-amber-200/50 hover:border-amber-300 rounded-xl p-5 text-left transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
               >
                 <div className="w-12 h-12 mb-3 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300">
@@ -327,6 +498,195 @@ const Dashboard = () => {
           </Card.Body>
         </Card>
       </div>
+
+      {/* Modal para Nuevo Cliente */}
+      <Modal
+        isOpen={showClienteModal}
+        onClose={handleCloseClienteModal}
+        title="Nuevo Cliente"
+        size="md"
+      >
+        <div className="space-y-4">
+          {clienteErrors.general && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+              {clienteErrors.general}
+            </div>
+          )}
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Nombre <span className="text-red-500">*</span>
+            </label>
+            <Input
+              type="text"
+              name="nombre"
+              value={clienteFormData.nombre}
+              onChange={handleClienteInputChange}
+              placeholder="Nombre completo del cliente"
+              error={clienteErrors.nombre}
+            />
+            {clienteErrors.nombre && (
+              <p className="text-red-500 text-xs mt-1">{clienteErrors.nombre}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Teléfono
+            </label>
+            <Input
+              type="tel"
+              name="telefono"
+              value={clienteFormData.telefono}
+              onChange={handleClienteInputChange}
+              placeholder="809-555-0000"
+              error={clienteErrors.telefono}
+            />
+            {clienteErrors.telefono && (
+              <p className="text-red-500 text-xs mt-1">{clienteErrors.telefono}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Dirección
+            </label>
+            <Input
+              type="text"
+              name="direccion"
+              value={clienteFormData.direccion}
+              onChange={handleClienteInputChange}
+              placeholder="Calle, ciudad, sector..."
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Notas
+            </label>
+            <textarea
+              name="notas"
+              value={clienteFormData.notas}
+              onChange={handleClienteInputChange}
+              placeholder="Notas adicionales sobre el cliente..."
+              rows="3"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all duration-200"
+            />
+          </div>
+
+          <div className="flex gap-3 pt-4">
+            <Button
+              variant="outline"
+              fullWidth
+              onClick={handleCloseClienteModal}
+              disabled={submitting}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="primary"
+              fullWidth
+              onClick={handleSaveCliente}
+              disabled={submitting}
+            >
+              {submitting ? 'Guardando...' : 'Crear Cliente'}
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Modal para Registrar Venta/Pago */}
+      <Modal
+        isOpen={showTransaccionModal}
+        onClose={handleCloseTransaccionModal}
+        title={transaccionTipo === 'venta' ? 'Nueva Venta' : 'Registrar Pago'}
+        size="md"
+      >
+        <div className="space-y-4">
+          {transaccionErrors.general && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+              {transaccionErrors.general}
+            </div>
+          )}
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Cliente <span className="text-red-500">*</span>
+            </label>
+            <select
+              name="cliente_id"
+              value={transaccionFormData.cliente_id}
+              onChange={handleTransaccionInputChange}
+              className={`w-full px-4 py-2.5 border ${transaccionErrors.cliente_id ? 'border-red-300' : 'border-gray-300'} rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all duration-200`}
+            >
+              <option value="">Seleccionar cliente...</option>
+              {clientes.map(cliente => (
+                <option key={cliente.id} value={cliente.id}>
+                  {cliente.nombre} {cliente.saldo_total > 0 ? `(Deuda: $${parseFloat(cliente.saldo_total).toFixed(2)})` : ''}
+                </option>
+              ))}
+            </select>
+            {transaccionErrors.cliente_id && (
+              <p className="text-red-500 text-xs mt-1">{transaccionErrors.cliente_id}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Monto <span className="text-red-500">*</span>
+            </label>
+            <Input
+              type="number"
+              name="monto"
+              value={transaccionFormData.monto}
+              onChange={handleTransaccionInputChange}
+              placeholder="0.00"
+              min="0"
+              step="0.01"
+              error={transaccionErrors.monto}
+            />
+            {transaccionErrors.monto && (
+              <p className="text-red-500 text-xs mt-1">{transaccionErrors.monto}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Descripción <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              name="descripcion"
+              value={transaccionFormData.descripcion}
+              onChange={handleTransaccionInputChange}
+              placeholder={transaccionTipo === 'venta' ? 'Ej: Cerveza Presidente 12 pack x 2' : 'Ej: Pago parcial de deuda'}
+              rows="3"
+              className={`w-full px-4 py-2 border ${transaccionErrors.descripcion ? 'border-red-300' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all duration-200`}
+            />
+            {transaccionErrors.descripcion && (
+              <p className="text-red-500 text-xs mt-1">{transaccionErrors.descripcion}</p>
+            )}
+          </div>
+
+          <div className="flex gap-3 pt-4">
+            <Button
+              variant="outline"
+              fullWidth
+              onClick={handleCloseTransaccionModal}
+              disabled={submitting}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant={transaccionTipo === 'venta' ? 'warning' : 'success'}
+              fullWidth
+              onClick={handleSaveTransaccion}
+              disabled={submitting}
+            >
+              {submitting ? 'Guardando...' : (transaccionTipo === 'venta' ? 'Registrar Venta' : 'Registrar Pago')}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </MainLayout>
   );
 };
