@@ -591,6 +591,41 @@ const Transacciones = () => {
         size="md"
       >
         <div className="space-y-4">
+          {/* Aviso informativo según el tipo */}
+          {modalMode === 'pago' ? (
+            <div className="bg-green-50 border-l-4 border-green-500 px-4 py-3 rounded-lg">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0">
+                  <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-sm font-semibold text-green-800 mb-1">Registrar Pago</h4>
+                  <p className="text-xs text-green-700">
+                    Esta opción es para cuando el cliente <strong>PAGA su deuda</strong>. El monto ingresado se RESTARÁ de la deuda total del cliente.
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-amber-50 border-l-4 border-amber-500 px-4 py-3 rounded-lg">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0">
+                  <svg className="w-5 h-5 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-sm font-semibold text-amber-800 mb-1">Nueva Venta</h4>
+                  <p className="text-xs text-amber-700">
+                    Esta opción es para <strong>REGISTRAR PRODUCTOS/ARTÍCULOS</strong> vendidos al cliente. El monto se SUMARÁ a la deuda del cliente.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {formErrors.general && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
               {formErrors.general}

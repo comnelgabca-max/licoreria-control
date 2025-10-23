@@ -59,6 +59,7 @@ const MoneyDisplay = ({
     'blue': 'text-blue-600',
     'amber': 'text-amber-600',
     'sky': 'text-sky-600',
+    'white': 'text-white',
   };
 
   const bsColorClasses = {
@@ -68,6 +69,7 @@ const MoneyDisplay = ({
     'blue': 'text-blue-500',
     'amber': 'text-amber-500',
     'sky': 'text-sky-500',
+    'white': 'text-white/80',
   };
 
   return (

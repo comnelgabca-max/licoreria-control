@@ -47,7 +47,7 @@ const StatCard = forwardRef(({
           <div className="flex-1">
             <p className="text-white/80 text-sm font-medium mb-1">{title}</p>
             <div className="flex items-baseline gap-2">
-              <h3 className="text-3xl lg:text-4xl font-bold">{value}</h3>
+              <h3 className="text-3xl lg:text-4xl font-bold text-white">{value}</h3>
               {trend && (
                 <span className={`text-sm font-semibold ${trend > 0 ? 'text-green-300' : 'text-red-300'}`}>
                   {trend > 0 ? '↑' : '↓'} {Math.abs(trend)}%
