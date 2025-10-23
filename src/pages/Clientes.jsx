@@ -248,16 +248,14 @@ const Clientes = () => {
               {totalClientes} clientes registrados • {clientesConDeuda} con deuda
             </p>
           </div>
-          {isAdmin && (
-            <Button
-              variant="primary"
-              icon={<Icon name="plus" size="sm" />}
-              iconPosition="left"
-              onClick={handleOpenCreate}
-            >
-              Nuevo Cliente
-            </Button>
-          )}
+          <Button
+            variant="primary"
+            icon={<Icon name="plus" size="sm" />}
+            iconPosition="left"
+            onClick={handleOpenCreate}
+          >
+            Nuevo Cliente
+          </Button>
         </div>
 
         {/* Estadísticas rápidas */}
@@ -430,23 +428,21 @@ const Clientes = () => {
                             >
                               Ver
                             </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleOpenEdit(cliente)}
+                            >
+                              Editar
+                            </Button>
                             {isAdmin && (
-                              <>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleOpenEdit(cliente)}
-                                >
-                                  Editar
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleDeleteCliente(cliente.id)}
-                                >
-                                  Eliminar
-                                </Button>
-                              </>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDeleteCliente(cliente.id)}
+                              >
+                                Eliminar
+                              </Button>
                             )}
                           </div>
                         </td>
@@ -496,23 +492,21 @@ const Clientes = () => {
                         >
                           Ver
                         </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleOpenEdit(cliente)}
+                        >
+                          Editar
+                        </Button>
                         {isAdmin && (
-                          <>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleOpenEdit(cliente)}
-                            >
-                              Editar
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDeleteCliente(cliente.id)}
-                            >
-                              Eliminar
-                            </Button>
-                          </>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteCliente(cliente.id)}
+                          >
+                            Eliminar
+                          </Button>
                         )}
                       </div>
                     </div>

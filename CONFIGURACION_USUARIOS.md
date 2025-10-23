@@ -12,9 +12,9 @@ Para crear usuarios desde tu aplicación, necesitas usar la **Service Role Key**
 
 Esta es la forma más segura ya que la Service Role Key nunca se expone al cliente.
 
-1. **Crear Edge Function en Supabase**:
+1. **Crear Edge  en Supabase**:
    - Ve a **Edge Functions** en Supabase
-   - Crea una nueva función llamada `create-user`
+   - Crea una nuevaFunction función llamada `create-user`
    - Implementa la lógica de creación de usuarios
 
 2. **Llamar a la función desde tu app**:
